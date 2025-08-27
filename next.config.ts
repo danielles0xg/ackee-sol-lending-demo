@@ -22,10 +22,6 @@ const nextConfig: NextConfig = {
     return config
   },
   
-  // Add experimental configurations for better module handling
-  experimental: {
-    esmExternals: 'loose',
-  },
   
   // Transpile the pyth packages
   transpilePackages: ['@pythnetwork/pyth-solana-receiver'],

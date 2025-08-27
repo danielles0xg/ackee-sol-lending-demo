@@ -18,7 +18,7 @@ import {
   createMintToInstruction,
   createTransferInstruction
 } from '@solana/spl-token'
-import { Transaction, Keypair, sendAndConfirmTransaction } from '@solana/web3.js'
+import { Transaction, Keypair } from '@solana/web3.js'
 import bs58 from 'bs58'
 
 export function useLendingProgram() {

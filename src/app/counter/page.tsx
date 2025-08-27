@@ -1,5 +1,5 @@
-import CounterFeature from '@/components/lending/lending-feature'
+import LendingFeature from '@/components/lending/lending-feature'
 
 export default function Page() {
-  return <CounterFeature />
+  return <LendingFeature />
 }

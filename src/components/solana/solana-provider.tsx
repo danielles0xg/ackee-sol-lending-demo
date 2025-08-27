@@ -26,9 +26,27 @@ export function SolanaProvider({ children }: { children: ReactNode }) {
     console.error(error)
   }, [])
 
+  // Check if we're on the client side and localStorage is available
+  const autoConnect = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        // Test localStorage access
+        const test = '__localStorage_test__'
+        window.localStorage.setItem(test, test)
+        window.localStorage.removeItem(test)
+        return true
+      } catch (e) {
+        // localStorage is not available
+        console.warn('localStorage is not available, disabling autoConnect')
+        return false
+      }
+    }
+    return false
+  }, [])
+
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={[]} onError={onError} autoConnect={true}>
+      <WalletProvider wallets={[]} onError={onError} autoConnect={autoConnect}>
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>
