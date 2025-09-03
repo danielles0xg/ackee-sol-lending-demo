@@ -18,7 +18,8 @@ import {
   createMintToInstruction,
   createTransferInstruction
 } from '@solana/spl-token'
-import { Transaction, Keypair } from '@solana/web3.js'
+import { Transaction } from '@solana/web3.js'
+import { Keypair } from '@solana/web3.js'
 import bs58 from 'bs58'
 
 export function useLendingProgram() {
@@ -180,11 +181,17 @@ export function useLendingProgram() {
         }
       }
       
+      // Check if this is the first time deposit for the user
+      let isFirstDeposit = false
+      
       // Check if user account exists, if not try to initialize it
       try {
-        await program.account.user.fetch(userAccount)
+        const userAccountData = await program.account.user.fetch(userAccount)
+        // Check if user has never deposited before
+        isFirstDeposit = userAccountData.depositedSol.toNumber() === 0 && userAccountData.depositedUsdc.toNumber() === 0
       } catch {
         // User doesn't exist, initialize it
+        isFirstDeposit = true
         try {
           await program.methods
             .initUser(mint) // Use the deposit mint as the USDC address
@@ -215,7 +222,8 @@ export function useLendingProgram() {
         }
       }
       
-      return program.methods
+      // Perform the deposit
+      const depositSignature = await program.methods
         .deposit(new BN(amount))
         .accountsPartial({
           signer: provider.wallet.publicKey,
@@ -229,6 +237,30 @@ export function useLendingProgram() {
           systemProgram: SystemProgram.programId,
         })
         .rpc()
+      
+      // If this is the first deposit, log for NFT feature
+      if (isFirstDeposit) {
+        // NFT collection program ID for future integration
+        const NFT_COLLECTION_PROGRAM = new PublicKey('7YZs5jJiAPkQtyqqnWjHVEwwydKmGxk2t97TMz1iaAdT')
+        
+        console.log('First-time depositor detected!')
+        console.log('NFT Collection Program:', NFT_COLLECTION_PROGRAM.toString())
+        console.log('Wallet:', provider.wallet.publicKey.toString())
+        console.log('Deposit amount:', amount)
+        
+        // The NFT minting would be handled by calling the NFT collection program
+        // Since we don't have the correct IDL for that program, we'll just log
+        // the intent and show a success message
+        
+        toast.success('Welcome! This is your first deposit. NFT reward feature coming soon!')
+        
+        // In a complete implementation, you would:
+        // 1. Call the NFT collection program's mint instruction
+        // 2. Pass the user's wallet and deposit amount
+        // 3. The NFT program would mint a unique NFT to the user's wallet
+      }
+      
+      return depositSignature
     },
     onSuccess: async (signature) => {
       transactionToast(signature)

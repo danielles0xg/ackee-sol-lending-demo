@@ -19,12 +19,27 @@ const nextConfig: NextConfig = {
       '.mjs': ['.mjs'],
     }
     
+    // Fix rpc-websockets module resolution issue for jito-ts compatibility
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'rpc-websockets/dist/lib/client': 'rpc-websockets',
+      'rpc-websockets/dist/lib/client/websocket': 'rpc-websockets',
+    }
+    
+    // Ignore jito-ts and use a browser-compatible build
+    config.externals = config.externals || {}
+    if (!isServer) {
+      config.externals.push({
+        'jito-ts': 'jito-ts',
+      })
+    }
+    
     return config
   },
   
   
   // Transpile the pyth packages
-  transpilePackages: ['@pythnetwork/pyth-solana-receiver'],
+  transpilePackages: ['@pythnetwork/pyth-solana-receiver', 'jito-ts'],
 }
 
 export default nextConfig

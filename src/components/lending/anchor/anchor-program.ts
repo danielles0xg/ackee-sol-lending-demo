@@ -9,6 +9,7 @@ export { Lending, LendingIDL }
 
 // The programId is imported from the program IDL.
 export const LENDING_PROGRAM_ID = new PublicKey(LendingIDL.address)
+export const BANK_NFT_COLLECTION_ID = new PublicKey('7YZs5jJiAPkQtyqqnWjHVEwwydKmGxk2t97TMz1iaAdT');
 
 // This is a helper function to get the Counter Anchor program.
 export function getCounterProgram(provider: AnchorProvider, address?: PublicKey): Program<Lending> {
@@ -19,7 +20,7 @@ export function getCounterProgram(provider: AnchorProvider, address?: PublicKey)
 export function getCounterProgramId(cluster: Cluster) {
   switch (cluster) {
     case 'devnet':
-      return new PublicKey('FQwNs7BPQ9NW258VxGHo885VqPqHPk7yFZUFgDLJx9Hd')
+      return new PublicKey('3CZsmvh2sNtxPbkDisbPzud2NWadaQCY8EevAHZTFgYw')
     case 'testnet':
     case 'mainnet-beta':
     default:
