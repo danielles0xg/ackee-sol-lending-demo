@@ -22,24 +22,27 @@ const nextConfig: NextConfig = {
     // Fix rpc-websockets module resolution issue for jito-ts compatibility
     config.resolve.alias = {
       ...config.resolve.alias,
-      'rpc-websockets/dist/lib/client': 'rpc-websockets',
-      'rpc-websockets/dist/lib/client/websocket': 'rpc-websockets',
+      'rpc-websockets/dist/lib/client': require.resolve('rpc-websockets'),
+      'rpc-websockets/dist/lib/client/websocket': require.resolve('rpc-websockets'),
     }
     
-    // Ignore jito-ts and use a browser-compatible build
-    config.externals = config.externals || {}
-    if (!isServer) {
-      config.externals.push({
-        'jito-ts': 'jito-ts',
-      })
-    }
+    // Handle jito-ts module resolution
+    config.module.rules.push({
+      test: /node_modules\/jito-ts/,
+      resolve: {
+        fullySpecified: false,
+      },
+    })
     
     return config
   },
   
-  
   // Transpile the pyth packages
-  transpilePackages: ['@pythnetwork/pyth-solana-receiver', 'jito-ts'],
+  transpilePackages: [
+    '@pythnetwork/pyth-solana-receiver',
+    '@pythnetwork/solana-utils',
+    'jito-ts'
+  ],
 }
 
 export default nextConfig

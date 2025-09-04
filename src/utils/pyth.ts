@@ -1,60 +1,40 @@
-import { Connection, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 
-// Based on the test file and program constants, we need to use the USDC feed ID
-// This appears to be what the test is expecting even though it's labeled as SOL
+// Mock Oracle Implementation for Vercel Deployment
+// This provides consistent mock price feed data without external dependencies
+
 export const SOL_PRICE_FEED_ID = "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
 
-// Add Buffer polyfill for browser environment
-if (typeof window !== 'undefined' && !window.Buffer) {
-  import('buffer').then(({ Buffer }) => {
-    window.Buffer = Buffer
-  })
-}
-
-// Function to get the price feed account for wSOL borrowing
-// Note: Based on test file, this uses USDC feed ID but is used for SOL borrowing
+// Mock price feed account - returns a deterministic PublicKey
 export async function getSolPriceFeedAccount() {
   try {
-    // Dynamic import with error handling
-    const pythModule = await import('@pythnetwork/pyth-solana-receiver').catch((err) => {
-      console.error('Failed to import pyth-solana-receiver:', err)
-      return null
-    })
+    // Return a mock but valid Solana PublicKey for the oracle
+    // This is the Pyth program ID on devnet, used as a placeholder
+    const mockOracleAccount = new PublicKey('7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE')
     
-    if (!pythModule) {
-      // Return a placeholder account if module fails to load
-      console.warn('Using fallback Pyth program ID')
-      return new PublicKey('7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE')
-    }
+    console.log('Mock price feed account for SOL:', mockOracleAccount.toString())
+    console.log('Using feed ID:', SOL_PRICE_FEED_ID)
     
-    const { PythSolanaReceiver } = pythModule
-    
-    // Create receiver instance for devnet  
-    const pythSolanaReceiver = new PythSolanaReceiver({
-      connection: new Connection("https://api.devnet.solana.com"),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      wallet: {} as any, // We don't need wallet for getting the address
-    })
-
-    // Get the price feed account address using the feed ID from test file
-    const priceFeedAccount = pythSolanaReceiver.getPriceFeedAccountAddress(0, SOL_PRICE_FEED_ID)
-    console.log('Price feed account for borrowing:', priceFeedAccount.toString())
-    
-    // Try to fetch actual price update to create a valid account
-    // Note: Removing getLatestPriceUpdates call as it doesn't exist on PythSolanaReceiver
-    // The getPriceFeedAccountAddress method should be sufficient for getting the account
-    try {
-      // Alternative approach: just verify the account exists
-      console.log('Price feed account created/verified for:', SOL_PRICE_FEED_ID)
-    } catch (priceError) {
-      console.warn('Could not verify price feed account:', priceError)
-      // Continue with just the address
-    }
-    
-    return priceFeedAccount
+    return mockOracleAccount
   } catch (error) {
-    console.error('Error getting price feed account:', error)
-    // Return Pyth program ID on devnet as fallback
-    return new PublicKey('7UVimffxr9ow1uXYxsr4LHAcV58mLzhmwaeKvJ1pjLiE')
+    console.error('Error creating mock price feed account:', error)
+    // Fallback to a default PublicKey
+    return new PublicKey('11111111111111111111111111111111')
+  }
+}
+
+// Mock price data getter for UI components
+export function getMockPriceData() {
+  return {
+    sol: {
+      price: 150.00,
+      change24h: 2.5,
+      lastUpdate: new Date().toISOString()
+    },
+    usdc: {
+      price: 1.00,
+      change24h: 0,
+      lastUpdate: new Date().toISOString()
+    }
   }
 }
