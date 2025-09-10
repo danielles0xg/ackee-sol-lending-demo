@@ -1,6 +1,6 @@
 # Project Description
 
-**Deployed Frontend URL:** LINK
+**Deployed Frontend URL:** https://ackee-sol-lending-demo-6x9v.vercel.app/
 
 **Solana Program ID:** FQwNs7BPQ9NW258VxGHo885VqPqHPk7yFZUFgDLJx9Hd
 
